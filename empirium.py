@@ -37,4 +37,4 @@ def verify_input(contents):
 if __name__ == '__main__':
     contents = get_input('sublime', INPUT_TEMPLATE.format(mood='',
                                                           phys=''))
-    parse_input(contents)
+    verify_input(contents)
