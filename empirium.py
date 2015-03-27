@@ -7,9 +7,7 @@ import optparse
 import subprocess
 
 from collections import defaultdict
-
 from email.mime.text import MIMEText
-
 from tempfile import NamedTemporaryFile
 
 INPUT_TEMPLATE = '''Mood: {mood}
@@ -20,15 +18,15 @@ REGEX_TEMPLATE = INPUT_TEMPLATE.format(mood=r'(?P<mood>\d+)',
 
 def get_input(editor, initial=''):
     with NamedTemporaryFile(delete=False) as tf:
-        tfName = tf.name
+        tf_name = tf.name
         tf.write(initial)
 
-    if subprocess.call([editor, tfName, '-w']) != 0: # Wait for file to close
+    if subprocess.call([editor, tf_name, '-w']) != 0: # Wait for file to close
         raise Exception("Sorry my friendo, the editor est muerte!")
 
-    with open(tfName) as tf:
+    with open(tf_name) as tf:
         contents = tf.read()
-        os.remove(tfName)
+        os.remove(tf_name)
         return contents
 
 def verify_input(contents):
