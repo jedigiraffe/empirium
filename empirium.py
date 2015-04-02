@@ -31,7 +31,8 @@ def get_input(editor, initial=''):
 
 def verify_input(contents):
     if not re.match(REGEX_TEMPLATE, contents):
-        print("Please follow the correct template!")
+        print("Please follow the correct template!\n",
+              "Empirium will now exit, sorry about that...")
         sys.exit(1)
 
 if __name__ == '__main__':
