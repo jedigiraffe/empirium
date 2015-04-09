@@ -5,8 +5,9 @@ import sys
 import datetime
 import optparse
 import subprocess
+import smtplib
 
-from collections import defaultdict
+from datetime import datetime
 from email.mime.text import MIMEText
 from tempfile import NamedTemporaryFile
 
@@ -35,7 +36,13 @@ def verify_input(contents):
               "Empirium will now exit, sorry about that...")
         sys.exit(1)
 
+def send_statistics(contents):
+    msg = MIMEText(contents)
+    msg['Subject'] = None # TODO: Format well
+    print(msg)
+
 if __name__ == '__main__':
     contents = get_input('sublime', INPUT_TEMPLATE.format(mood='',
                                                           phys=''))
     verify_input(contents)
+    send_statistics(contents)
