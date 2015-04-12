@@ -10,12 +10,7 @@ import smtplib
 from datetime import datetime
 from email.mime.text import MIMEText
 from tempfile import NamedTemporaryFile
-
-INPUT_TEMPLATE = '''Mood: {mood}
-Physical performance: {phys}'''
-
-REGEX_TEMPLATE = INPUT_TEMPLATE.format(mood=r'(?P<mood>\d+)',
-                                       phys=r'(?P<phys>\d+)')
+from templates import INPUT_TEMPLATE, REGEX_TEMPLATE
 
 def get_input(editor, initial=''):
     with NamedTemporaryFile(delete=False) as tf:
@@ -42,7 +37,8 @@ def send_statistics(contents):
     print(msg)
 
 if __name__ == '__main__':
-    contents = get_input('sublime', INPUT_TEMPLATE.format(mood='',
-                                                          phys=''))
+    # TODO: get editor from command line args
+    contents = get_input('subl', INPUT_TEMPLATE.format(mood='',
+                                                       phys=''))
     verify_input(contents)
     send_statistics(contents)
