@@ -2,15 +2,15 @@
 import re
 import os
 import sys
+import argparse
 import datetime
-import optparse
 import subprocess
 import smtplib
 
-from datetime import datetime
+from datetime import date
 from email.mime.text import MIMEText
 from tempfile import NamedTemporaryFile
-from templates import INPUT_TEMPLATE, REGEX_TEMPLATE
+from templates import TEMPLATES, REGEX_TEMPLATES
 
 def get_input(editor, initial=''):
     with NamedTemporaryFile(delete=False) as tf:
@@ -26,19 +26,19 @@ def get_input(editor, initial=''):
         return contents
 
 def verify_input(contents):
-    if not re.match(REGEX_TEMPLATE, contents):
-        print("Please follow the correct template!\n",
+    if not re.match(REGEX_TEMPLATES['midday'], contents):
+        print("Please follow the correct template!\n" + # Python 2 compatibility
               "Empirium will now exit, sorry about that...")
         sys.exit(1)
 
-def send_statistics(contents):
+def send_statistics(contents, time_of_day):
     msg = MIMEText(contents)
-    msg['Subject'] = None # TODO: Format well
+    msg['Subject'] = "{} of {}".format(time_of_day, datetime.date.today()) # TODO: Format well
     print(msg)
 
 if __name__ == '__main__':
     # TODO: get editor from command line args
-    contents = get_input('subl', INPUT_TEMPLATE.format(mood='',
-                                                       phys=''))
+    contents = get_input('subl', re.sub(r'\{[a-z]+\}', '',
+                                        TEMPLATES['midday']))
     verify_input(contents)
-    send_statistics(contents)
+    send_statistics(contents, "Morning")
