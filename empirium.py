@@ -7,7 +7,7 @@ import datetime
 import subprocess
 import smtplib
 
-from datetime import date
+from datetime import datetime, date, time
 from email.mime.text import MIMEText
 from tempfile import NamedTemporaryFile
 from templates import TEMPLATES, REGEX_TEMPLATES
@@ -36,9 +36,23 @@ def send_statistics(contents, time_of_day):
     msg['Subject'] = "{} of {}".format(time_of_day, datetime.date.today()) # TODO: Format well
     print(msg)
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Obtain important statistical data!")
+    parser.add_argument('-t', '--time-of-day',
+                        type=str,
+                        dest='time_of_day',
+                        choices=('morning', 'midday', 'evening'))
+    parser.add_argument('-e', '--editor',
+                        type=str)
+    args = parser.parse_args()
+    return args
+
 if __name__ == '__main__':
-    # TODO: get editor from command line args
-    contents = get_input('subl', re.sub(r'\{[a-z]+\}', '',
+    args = parse_args()
+    editor = args.editor or 'subl'
+    time_of_day = args.time_of_day or datetime.now().time()
+    print editor, time_of_day
+    contents = get_input(editor, re.sub(r'\{[a-z]+\}', '',
                                         TEMPLATES['midday']))
     verify_input(contents)
     send_statistics(contents, "Morning")
