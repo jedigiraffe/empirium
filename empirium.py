@@ -7,10 +7,18 @@ import datetime
 import subprocess
 import smtplib
 
-from datetime import datetime, date, time
+from datetime import datetime, time
 from email.mime.text import MIMEText
 from tempfile import NamedTemporaryFile
 from templates import TEMPLATES, REGEX_TEMPLATES
+
+def get_time_of_day(now):
+    if time(5) < now < time(12):
+        return 'morning'
+    elif time(12) < now < time(18):
+        return 'midday'
+    else:
+        return 'evening'
 
 def get_input(editor, initial=''):
     with NamedTemporaryFile(delete=False) as tf:
@@ -33,7 +41,7 @@ def verify_input(contents):
 
 def send_statistics(contents, time_of_day):
     msg = MIMEText(contents)
-    msg['Subject'] = "{} of {}".format(time_of_day, datetime.date.today()) # TODO: Format well
+    msg['Subject'] = "{} of {}".format(time_of_day, datetime.now().date()) # TODO: Format well
     print(msg)
 
 def parse_args():
@@ -50,7 +58,7 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
     editor = args.editor or 'subl'
-    time_of_day = args.time_of_day or datetime.now().time()
+    time_of_day = args.time_of_day or get_time_of_day(datetime.now().time())
     print editor, time_of_day
     contents = get_input(editor, re.sub(r'\{[a-z]+\}', '',
                                         TEMPLATES['midday']))
