@@ -7,6 +7,7 @@ import datetime
 import subprocess
 import smtplib
 
+from getpass import getpass
 from datetime import datetime, time
 from email.mime.text import MIMEText
 from tempfile import NamedTemporaryFile
@@ -42,14 +43,22 @@ def verify_input(contents, template):
 def send_statistics(contents, time_of_day, simulate):
     msg = MIMEText(contents)
     msg['Subject'] = "{} of {}".format(time_of_day, datetime.now().date())
-    msg['From'] = 'empirium@noreply.com'
+    msg['From'] = 'empirium.stat@gmail.com'
     msg['To'] = 'empirium.stat@gmail.com'
     if simulate:
         print(msg)
     else:
-        s = smtplib.SMTP('localhost')
-        s.sendmail("empirium@noreply.com", ['empirium.stat@gmail.com'], msg.as_string())
-        s.quit()
+        try:
+            # Use Gmail smtp server
+            s = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+            print("Submitting from user empirium.stat.")
+            s.login('empirium.stat', getpass())
+            s.sendmail(msg['From'],
+                       [msg['To']],
+                       msg.as_string())
+            print("The deed is done!")
+        finally:
+            s.quit()
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Obtain important statistical data!")
