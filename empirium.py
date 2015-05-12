@@ -21,6 +21,13 @@ def get_time_of_day(now):
     else:
         return 'evening'
 
+def verify_date(date):
+    try:
+        datetime.strptime(date, "%d-%m-%Y")
+    except ValueError:
+        raise argparse.ArgumentTypeError('"{}" is not a valid date'.format(date))
+    return date
+
 def get_input(editor, initial=''):
     with NamedTemporaryFile(delete=False) as tf:
         tf_name = tf.name
@@ -40,9 +47,9 @@ def verify_input(contents, template):
               "Empirium will now exit, sorry about that...")
         sys.exit(1)
 
-def send_statistics(contents, time_of_day, simulate):
+def send_statistics(contents, time_of_day, date, simulate):
     msg = MIMEText(contents)
-    msg['Subject'] = "{} of {}".format(time_of_day, datetime.now().date())
+    msg['Subject'] = "{} of {}".format(time_of_day, date)
     msg['From'] = 'empirium.stat@gmail.com'
     msg['To'] = 'empirium.stat@gmail.com'
     if simulate:
@@ -66,6 +73,9 @@ def parse_args():
                         type=str,
                         dest='time_of_day',
                         choices=('morning', 'midday', 'evening'))
+    parser.add_argument('-d', '--date',
+                        type=verify_date,
+                        metavar="DD-MM-YYYY")
     parser.add_argument('-e', '--editor',
                         type=str)
     parser.add_argument('--simulate',
@@ -77,7 +87,8 @@ if __name__ == '__main__':
     args = parse_args()
     editor = args.editor or 'subl'
     time_of_day = args.time_of_day or get_time_of_day(datetime.now().time())
+    date = args.date or datetime.now().date()
     contents = get_input(editor, re.sub(r'\{[a-z]+\}', '',
                                         TEMPLATES[time_of_day]))
     verify_input(contents, REGEX_TEMPLATES[time_of_day])
-    send_statistics(contents, time_of_day.capitalize(), args.simulate)
+    send_statistics(contents, time_of_day.capitalize(), date, args.simulate)
